@@ -1,4 +1,5 @@
 ﻿main();
+myNoTextTextFrames();
 function main(){
 
 var myText=app.findGrep();
@@ -20,3 +21,17 @@ app.findChangeGrepOptions.includeLockedStoriesForFind = false;
 app.findChangeGrepOptions.includeMasterPages = false;
 }
 
+function myNoTextTextFrames(){
+    var myDoc=app.activeDocument;
+    var myTextFrames=myDoc.textFrames;
+    for (var x=0;x<myTextFrames.length;x++){
+        if (myTextFrames[x].contents.length<=1){
+        //  alert(myTextFrames[x].contents.length);
+          myTextFrames[x].parentPage.appliedMaster=NothingEnum.NOTHING;
+            }
+
+}
+    
+    
+    
+    }
