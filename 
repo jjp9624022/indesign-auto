@@ -1,0 +1,329 @@
+[1mdiff --git a/changeMainPage.jsx b/changeMainPage.jsx[m
+[1mindex c0fe7c6..13e6c87 100644[m
+[1m--- a/changeMainPage.jsx[m
+[1m+++ b/changeMainPage.jsx[m
+[36m@@ -6,7 +6,7 @@[m [mvar myText=app.findGrep();[m
+ for  (var i=0; i<myText.length;i++)[m
+ {[m
+     myText[i].parentTextFrames[0].parentPage.appliedMaster=NothingEnum.NOTHING;[m
+[31m-    myText[i].parentTextFrames[0].nextTextFrame.parentPage.appliedMaster=NothingEnum.NOTHING;[m
+[32m+[m[32m //   myText[i].parentTextFrames[0].nextTextFrame.parentPage.appliedMaster=NothingEnum.NOTHING;[m
+ //跨页的操作       [m
+        // myText[i].parentTextFrames[0].nextTextFrame.parentPage.parent.appliedMaster=NothingEnum.NOTHING;[m
+ [m
+[36m@@ -25,13 +25,19 @@[m [mfunction myNoTextTextFrames(){[m
+     var myDoc=app.activeDocument;[m
+     var myTextFrames=myDoc.textFrames;[m
+     for (var x=0;x<myTextFrames.length;x++){[m
+[31m-        if (myTextFrames[x].contents.length<=1){[m
+[32m+[m[32m        if (myTextFrames[x].contents.length<1){[m
+         //  alert(myTextFrames[x].contents.length);[m
+[32m+[m[32m        try{[m
+           myTextFrames[x].parentPage.appliedMaster=NothingEnum.NOTHING;[m
+[31m-            }[m
+[32m+[m[32m            }catch(err)[m
+[32m+[m[32m  {[m
+[32m+[m[32m  //在这里处理错误[m
+[32m+[m[32m  alert(err);[m
+[32m+[m[32m  }[m
+[32m+[m[41m        [m
+ [m
+ }[m
+     [m
+[31m-    [m
+[32m+[m[32m    }[m
+     [m
+     }[m
+\ No newline at end of file[m
+[1mdiff --git a/changeTrack0.2.jsx b/changeTrack0.2.jsx[m
+[1mindex 483f4eb..4c70e3f 100644[m
+[1m--- a/changeTrack0.2.jsx[m
+[1m+++ b/changeTrack0.2.jsx[m
+[36m@@ -4,22 +4,22 @@[m [mfunction main() {[m
+ [m
+   var myDocument = app.activeDocument;[m
+   var myLayer = myDocument.layers.add();[m
+[31m-  var myTextStyle=getTextStyle(myDocument,"更改");[m
+[31m-  var myColorA, myColorB;[m
+[32m+[m[32m  var myTextStyle = getTextStyle(myDocument, "更改");[m
+[32m+[m[32m  var myColorA, myColorB, myColorC;[m
+ [m
+ [m
+ [m
+   //颜色[m
+   try {[m
+[31m-    myColorA = myDocument.colors.item("Red");[m
+[32m+[m[32m    myColorA = myDocument.colors.item("Green");[m
+     //If the color does not exist, trying to get its name will generate an error.[m
+[31m-     myColorA.name;[m
+[32m+[m[32m    myColorA.name;[m
+   } catch (myError) {[m
+     //The color style did not exist, so create it.[m
+     myColorA = myDocument.colors.add({[m
+[31m-      name: "Red",[m
+[32m+[m[32m      name: "Green",[m
+       model: ColorModel.process,[m
+[31m-      colorValue: [0, 100, 100, 0][m
+[32m+[m[32m      colorValue: [100, 0, 100, 0][m
+     });[m
+   }[m
+   //Create another color.[m
+[36m@@ -36,12 +36,52 @@[m [mfunction main() {[m
+     });[m
+   }[m
+ [m
+[32m+[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    myColorC = myDocument.colors.item("Red");[m
+[32m+[m[32m    //If the color does not exist, trying to get its name will generate an error.[m
+[32m+[m[32m    myColorC.name;[m
+[32m+[m[32m  } catch (myError) {[m
+[32m+[m[32m    //The color style did not exist, so create it.[m
+[32m+[m[32m    myColorC = myDocument.colors.add({[m
+[32m+[m[32m      name: "Red",[m
+[32m+[m[32m      model: ColorModel.process,[m
+[32m+[m[32m      colorValue: [0, 100, 100, 0][m
+[32m+[m[32m    });[m
+[32m+[m[32m  }[m
+[32m+[m
+   myLayer = myDocument.activeLayer;[m
+   //当前页，当前文本框，主要作用是对同页面的修改，汇聚在一起[m
+   var presentPage;[m
+   var presentTextFrame;[m
+[32m+[m[32m  //全局总书签[m
+[32m+[m[32m  var myBookMarks = myDocument.bookmarks;[m
+[32m+[m[32m  //全局当前书签[m
+[32m+[m[32m  var prensentBookMarks;[m
+   //获取所有的更改[m
+   var mychanges = text_find_word(myDocument.stories);[m
+[32m+[m[32m  //为了让每一页的注释和更改都出现在一个文本框，在不修改太多代码的情况下，一个简单的排序是合适的。[m
+[32m+[m
+[32m+[m[32m  //这个排序是个舶来品，我都不是很明白他的含义[m
+[32m+[m[32m  var by = function(name, minor) {[m
+[32m+[m[32m    return function(o, p) {[m
+[32m+[m[32m      var a, b;[m
+[32m+[m[32m      if (o && p && typeof o === 'object' && typeof p === 'object') {[m
+[32m+[m[32m        a = o[name];[m
+[32m+[m[32m        b = p[name];[m
+[32m+[m[32m        if (a === b) {[m
+[32m+[m[32m          return typeof minor === 'function' ? minor(o, p) : 0;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        if (typeof a === typeof b) {[m
+[32m+[m[32m          return a < b ? -1 : 1;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        return typeof a < typeof b ? -1 : 1;[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        thro("error");[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m[32m  mychanges.sort(by('page.id', by('id')));[m
+   //循环每个更改，并注入到每页的更改文本框[m
+   for (var i = 0; i < mychanges.length; i++) {[m
+     //判断更改是否在当前页，如果在，在已有文本框里添加内容，如果不在，则重新建立文本框。  [m
+[36m@@ -49,6 +89,16 @@[m [mfunction main() {[m
+ [m
+       presentPage = mychanges[i].page;[m
+       presentTextFrame = presentPage.textFrames.add();[m
+[32m+[m
+[32m+[m
+[32m+[m[32m      //牛逼的分级书签开始[m
+[32m+[m[32m      var myPageLinkDestination = myDocument.hyperlinkPageDestinations.add(presentPage);[m
+[32m+[m[32m      prensentBookMarks = myBookMarks.add(myPageLinkDestination, {[m
+[32m+[m[32m        name: "更改页" + presentPage.index[m
+[32m+[m[32m      });[m
+[32m+[m
+[32m+[m
+[32m+[m
+       //清除可能的绕排[m
+       presentTextFrame.textWrapPreferences.textWrapMode = TextWrapModes.NONE;[m
+       //这里开始建立新的文本框，位置，我选择在页面的左上角到左下角,然后向左边偏移100。[m
+[36m@@ -69,14 +119,22 @@[m [mfunction main() {[m
+     origin.textWrapPreferences.textWrapMode = TextWrapModes.NONE;[m
+     origin.geometricBounds = [mychanges[i].position[1] - radius, mychanges[i].position[0] - radius, mychanges[i].position[1] + radius, mychanges[i].position[0] + radius];[m
+     //   [mychanges[i].position[1], mychanges[i].position[0], mychanges[i].position[1] + 20, mychanges[i].position[2] + 30][m
+[31m-    origin.fillColor = myColorA;[m
+[32m+[m[32m    //对类别做出判断，如果是注释，那么就添加红色，反之用绿色[m
+[32m+[m[32m    if (mychanges[i].types == "注释") {[m
+[32m+[m[32m      origin.fillColor = myColorC;[m
+[32m+[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      origin.fillColor = myColorA;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m
+     var idFrame = presentPage.textFrames.add();[m
+     idFrame.textWrapPreferences.textWrapMode = TextWrapModes.NONE;[m
+[31m-    idFrame.geometricBounds = [mychanges[i].position[1] - radius, mychanges[i].position[0] - radius, mychanges[i].position[1] + radius, mychanges[i].position[0] + radius];[m
+[32m+[m[32m    idFrame.geometricBounds = [mychanges[i].position[1] - radius, mychanges[i].position[0] - radius - 1, mychanges[i].position[1] + radius, mychanges[i].position[0] + radius + 1];[m
+     idFrame.contents = "" + mychanges[i].id;[m
+ [m
+     var myIndexText = idFrame.parentStory.texts.item(0);[m
+[31m-    myIndexText .applyParagraphStyle(myTextStyle,true);[m
+[32m+[m[32m    myIndexText.applyParagraphStyle(myTextStyle, true);[m
+     myIndexText.fillColor = myColorB;[m
+     myIndexText.justification = Justification.CENTER_ALIGN;[m
+     myIndexText.pointSize = 7;[m
+[36m@@ -88,7 +146,8 @@[m [mfunction main() {[m
+     gl.paths.item(0).pathPoints[0].anchor = [mychanges[i].position[0], mychanges[i].position[1]];[m
+     gl.paths.item(0).pathPoints[1].anchor = [mychanges[i].position[2], mychanges[i].position[1]];[m
+     gl.strokeColor = myColorA;[m
+[31m-    presentTextFrame.contents = presentTextFrame.contents + mychanges[i].id + "," + mychanges[i].user + mychanges[i].types + "了" + "“" + mychanges[i].text + "”" + "\r";[m
+[32m+[m
+[32m+[m[32m    presentTextFrame.contents = presentTextFrame.contents + mychanges[i].id + "." + mychanges[i].user + mychanges[i].types + "了" + "“" + mychanges[i].text + "”" + "\r";[m
+     //设置文本格式[m
+ [m
+     //获取文本样式[m
+[36m@@ -101,10 +160,31 @@[m [mfunction main() {[m
+ [m
+ [m
+ [m
+[31m-    //郁闷，基于样式居然会导致无效，只能曲线救国了。[m
+[31m-    var myText = presentTextFrame.parentStory.texts.item(0);[m
+[31m-    myText.applyParagraphStyle(myTextStyle,true);[m
+[31m-    myText.fillColor = myColorA;[m
+[32m+[m[32m    var myText = presentTextFrame.parentStory.paragraphs[-1].texts.item(0);[m
+[32m+[m[32m    myText.applyParagraphStyle(myTextStyle, true);[m
+[32m+[m
+[32m+[m[32m    var myLinkText = myText.characters.itemByRange(myText.characters[0], myText.characters[-2]).texts.item(0);[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    //加入超链接[m
+[32m+[m[32m    var mylinkSource = myDocument.hyperlinkTextSources.add(myLinkText);[m
+[32m+[m[32m    var myLinkDestination = myDocument.hyperlinkTextDestinations.add(myIndexText);[m
+[32m+[m[32m    myDocument.hyperlinks.add(mylinkSource, myLinkDestination);[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    //在每一页加入书签[m
+[32m+[m[32m    prensentBookMarks.bookmarks.add(myLinkDestination,{name:mychanges[i].id + "." + mychanges[i].types + "“" + mychanges[i].text + "”"});[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    //对文本颜色也进行更改[m
+[32m+[m[32m    if (mychanges[i].types == "注释") {[m
+[32m+[m[32m      myText.fillColor = myColorC;[m
+[32m+[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      myText.fillColor = myColorA;[m
+[32m+[m[32m    }[m
+[32m+[m
+     myText.justification = Justification.LEFT_ALIGN;[m
+     myText.pointSize = 8;[m
+     myText.startParagraph = StartParagraph.ANYWHERE;[m
+[36m@@ -116,13 +196,13 @@[m [mfunction main() {[m
+ [m
+ [m
+ //获取段落样式[m
+[31m-function getTextStyle(in_document,in_name) {[m
+[32m+[m[32mfunction getTextStyle(in_document, in_name) {[m
+   var myStyle;[m
+ [m
+   try {[m
+     myStyle = in_document.paragraphStyles.item(in_name);[m
+     //If the style does not exist, trying to get its name will generate an error.[m
+[31m-   //也叫一声吧,这里是个坑啊！！[m
+[32m+[m[32m    //也叫一声吧,这里是个坑啊！！[m
+     myStyle.name;[m
+   } catch (myError) {[m
+     //新建样式均不成功，inVaild=false[m
+[36m@@ -134,6 +214,20 @@[m [mfunction getTextStyle(in_document,in_name) {[m
+   return myStyle;[m
+ }[m
+ [m
+[32m+[m[32m//获取text对象中的文本内容[m
+[32m+[m[32mfunction contentsOfText(inTexts) {[m
+[32m+[m[32m  var myContents = "";[m
+[32m+[m[32m  if (inTexts.length > 0) {[m
+[32m+[m[32m    for (var j = 0; j < inTexts.length; j++) {[m
+[32m+[m[32m      myContents += inTexts[j].contents;[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m[32m  } else {[m
+[32m+[m[32m    myContents = "这里有修改";[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  return myContents;[m
+[32m+[m[32m}[m
+ [m
+ //获取颜色[m
+ function getColor(in_document, colorName, in_colorValue) {[m
+[36m@@ -141,7 +235,7 @@[m [mfunction getColor(in_document, colorName, in_colorValue) {[m
+   try {[m
+     //因此建议在ui中建立此颜色[m
+     in_color = in_document.colors.item(colorName);[m
+[31m-//居然需要叫一声，艹！[m
+[32m+[m[32m    //居然需要叫一声，艹！[m
+     in_color.name;[m
+   } catch (myError) {[m
+     //新建样式均不成功，inVaild=false[m
+[36m@@ -164,9 +258,33 @@[m [mfunction text_find_word(in_story) {[m
+   var result = new Array(); // this will be our return value[m
+ [m
+   var myStories = in_story;[m
+[32m+[m[32m  //这里是文章的循环[m
+   for (var i = 0; i < myStories.length; i++)[m
+ [m
+   {[m
+[32m+[m[32m    //这里是获取附注的循环[m
+[32m+[m[32m    for (var m = 0; m < myStories[i].notes.length; m++) {[m
+[32m+[m[32m      var myResult = myStories[i].notes[m].storyOffset;[m
+[32m+[m[32m      x = myResult.horizontalOffset;[m
+[32m+[m[32m      y = myResult.baseline - 2; //防止和其他的重叠。[m
+[32m+[m[32m      z = myResult.horizontalOffset;[m
+[32m+[m[32m      var id = myStories[i].notes[m].index;[m
+[32m+[m[32m      var page = myStories[i].notes[m].storyOffset.parentTextFrames[0].parentPage;[m
+[32m+[m[32m      var userName = myStories[i].notes[m].userName;[m
+[32m+[m[32m      var myText = contentsOfText(myStories[i].notes[m].texts);[m
+[32m+[m[32m      result.push({[m
+[32m+[m[32m        "id": id,[m
+[32m+[m[32m        "position": [x, y, z],[m
+[32m+[m[32m        "types": "注释",[m
+[32m+[m[32m        "text": myText,[m
+[32m+[m[32m        "page": page,[m
+[32m+[m[32m        "user": userName[m
+[32m+[m[32m      });[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    //这里是获取更改列表的循环[m
+     if (myStories[i].trackChanges == true) {[m
+       for (var m = 0; m < myStories[i].changes.length; m++) {[m
+ [m
+[36m@@ -181,16 +299,10 @@[m [mfunction text_find_word(in_story) {[m
+           x = myResult[0].horizontalOffset;[m
+           y = myResult[0].baseline;[m
+           z = myResult[-1].horizontalOffset;[m
+[31m-          //   if (myStories[i].changes[m].lines <= 1) {[m
+ [m
+[31m-          //     x = myStories[i].changes[m].lines[0].insertionPoints[0].horizontalOffset;[m
+[31m-          //     y = myStories[i].changes[m].lines[0].insertionPoints[0].myResult.baseline;[m
+[31m-          //     z = myStories[i].changes[m].lines[0].insertionPoints[-1].myResult.baseline;[m
+[31m-          //   } [m
+         }[m
+ [m
+ [m
+[31m-[m
+         var id = myStories[i].changes[m].index;[m
+ [m
+         var myChangeTypes;[m
+[36m@@ -203,19 +315,7 @@[m [mfunction text_find_word(in_story) {[m
+ [m
+         var myText = contentsOfText(myStories[i].changes[m].texts);[m
+ [m
+[31m-        function contentsOfText(inTexts) {[m
+[31m-          var myContents = "";[m
+[31m-          if (inTexts.length > 0) {[m
+[31m-            for (var j = 0; j < inTexts.length; j++) {[m
+[31m-              myContents += inTexts[j].contents;[m
+[31m-[m
+[31m-            }[m
+[31m-          } else {[m
+[31m-            myContents = "这里有修改";[m
+[31m-          }[m
+ [m
+[31m-          return myContents;[m
+[31m-        }[m
+ [m
+         var page = myStories[i].changes[m].storyOffset.parentTextFrames[0].parentPage;[m
+         var userName = myStories[i].changes[m].userName;[m

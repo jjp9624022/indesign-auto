@@ -6,7 +6,7 @@ var myText=app.findGrep();
 for  (var i=0; i<myText.length;i++)
 {
     myText[i].parentTextFrames[0].parentPage.appliedMaster=NothingEnum.NOTHING;
-    myText[i].parentTextFrames[0].nextTextFrame.parentPage.appliedMaster=NothingEnum.NOTHING;
+ //   myText[i].parentTextFrames[0].nextTextFrame.parentPage.appliedMaster=NothingEnum.NOTHING;
 //跨页的操作       
        // myText[i].parentTextFrames[0].nextTextFrame.parentPage.parent.appliedMaster=NothingEnum.NOTHING;
 
@@ -25,13 +25,19 @@ function myNoTextTextFrames(){
     var myDoc=app.activeDocument;
     var myTextFrames=myDoc.textFrames;
     for (var x=0;x<myTextFrames.length;x++){
-        if (myTextFrames[x].contents.length<=1){
+        if (myTextFrames[x].contents.length<1){
         //  alert(myTextFrames[x].contents.length);
+        try{
           myTextFrames[x].parentPage.appliedMaster=NothingEnum.NOTHING;
-            }
+            }catch(err)
+  {
+  //在这里处理错误
+  alert(err);
+  }
+        
 
 }
     
-    
+    }
     
     }
