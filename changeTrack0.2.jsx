@@ -82,10 +82,15 @@ function main() {
     }
   }
   mychanges.sort(by('page.id', by('id')));
+  //多文章的情况下，可能使得序号变的不一致，这个时候，我想，是否可以统一改动id了。
+
   //循环每个更改，并注入到每页的更改文本框
   for (var i = 0; i < mychanges.length; i++) {
-    //判断更改是否在当前页，如果在，在已有文本框里添加内容，如果不在，则重新建立文本框。  
+    mychanges[i].id=i+1;
     if (presentPage != mychanges[i].page) {
+    //判断更改是否在当前页，如果在，在已有文本框里添加内容，如果不在，则重新建立文本框。  
+
+      
 
       presentPage = mychanges[i].page;
       presentTextFrame = presentPage.textFrames.add();
@@ -173,7 +178,9 @@ function main() {
 
 
     //在每一页加入书签
-    prensentBookMarks.bookmarks.add(myLinkDestination,{name:mychanges[i].id + "." + mychanges[i].types + "“" + mychanges[i].text + "”"});
+    prensentBookMarks.bookmarks.add(myLinkDestination, {
+      name: mychanges[i].id + "." + mychanges[i].types + "“" + mychanges[i].text + "”"
+    });
 
 
 
@@ -250,6 +257,9 @@ function getColor(in_document, colorName, in_colorValue) {
 
   return in_color;
 }
+
+
+
 //获取文章中的修改条目，并获取其位置、修改人、修改类别等信息
 function text_find_word(in_story) {
 
@@ -285,49 +295,56 @@ function text_find_word(in_story) {
     }
 
     //这里是获取更改列表的循环
+    //改进了其他状态的能力，比如，判断此文本框是否字啊页面上
     if (myStories[i].trackChanges == true) {
       for (var m = 0; m < myStories[i].changes.length; m++) {
+        try { //这么大的try，原因是尽量过滤掉各种不需要考虑的特殊情况，如，更改在页面外，导致其没有归属的页面和位置属性
 
-        var x, y, z;
-        if (myStories[i].changes[m].changeType == ChangeTypes.DELETED_TEXT) {
-          var myResult = myStories[i].changes[m].storyOffset;
-          x = myResult.horizontalOffset;
-          y = myResult.baseline;
-          z = myResult.horizontalOffset;
-        } else {
-          var myResult = myStories[i].changes[m].insertionPoints;
-          x = myResult[0].horizontalOffset;
-          y = myResult[0].baseline;
-          z = myResult[-1].horizontalOffset;
+          var x, y, z;
+          if (myStories[i].changes[m].changeType == ChangeTypes.DELETED_TEXT) {
+            var myResult = myStories[i].changes[m].storyOffset;
+            x = myResult.horizontalOffset;
+            y = myResult.baseline;
+            z = myResult.horizontalOffset;
+          } else {
+            var myResult = myStories[i].changes[m].insertionPoints;
+            x = myResult[0].horizontalOffset;
+            y = myResult[0].baseline;
+            z = myResult[-1].horizontalOffset;
 
+
+          }
+
+
+{          var id = myStories[i].changes[m].index;
+
+          var myChangeTypes;
+          if (myStories[i].changes[m].changeType == ChangeTypes.DELETED_TEXT) {
+
+            myChangeTypes = "删除";
+          } else {
+            myChangeTypes = "添加"
+          }
+
+          var myText = contentsOfText(myStories[i].changes[m].texts);
+
+
+
+          var page = myStories[i].changes[m].storyOffset.parentTextFrames[0].parentPage;
+          var userName = myStories[i].changes[m].userName;
+
+          result.push({
+            "id": id,
+            "position": [x, y, z],
+            "types": myChangeTypes,
+            "text": myText,
+            "page": page,
+            "user": userName
+          });}
+
+        } catch (myError) {
+          //你看，我什么都没有做
         }
-
-
-        var id = myStories[i].changes[m].index;
-
-        var myChangeTypes;
-        if (myStories[i].changes[m].changeType == ChangeTypes.DELETED_TEXT) {
-
-          myChangeTypes = "删除";
-        } else {
-          myChangeTypes = "添加"
-        }
-
-        var myText = contentsOfText(myStories[i].changes[m].texts);
-
-
-
-        var page = myStories[i].changes[m].storyOffset.parentTextFrames[0].parentPage;
-        var userName = myStories[i].changes[m].userName;
-
-        result.push({
-          "id": id,
-          "position": [x, y, z],
-          "types": myChangeTypes,
-          "text": myText,
-          "page": page,
-          "user": userName
-        });
       }
     }
   }
