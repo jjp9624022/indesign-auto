@@ -1,4 +1,4 @@
-﻿#target "InDesign"
+#target "InDesign"
 main();
 function getColor(in_document, colorName, in_colorValue) {
   var in_color;
@@ -21,6 +21,8 @@ function getColor(in_document, colorName, in_colorValue) {
 }
 
 //居然要提前开始查询xpath，其实这是否可以由python端来做呢？
+//其实是正确的，这个脚本应该被用来指定更新，或者全局更新xml结构。
+//也应该restful？？？
 function mySimulateXPath(myXPath) {
 	var myXMLElements = new Array;
 	var myRuleProcessor = app.xmlRuleProcessors.add(myXPath);
@@ -55,27 +57,19 @@ function drawOrigin(in_page, in_color, in_position) {
 }
 
 
-function getXmlElement(object,tag,tagDesObject){
+function getXmlElement(object, tag, tagDesObject) {
 
 
 
-
-
-
-
-
-
-	try{
+	try {
 		var myStoryXMLElement = object.xmlElements.item(tag.name);
-		myStoryXMLElement.xmlAttributes.add("id", ""+myStories[i].id);
+		myStoryXMLElement.xmlAttributes.add("id", "" + myStories[i].id);
 		myStories[i].markup(myStoryXMLElement);
-	}catch{	
+	} catch (myError) {
 		var myStoryXMLElement = object.xmlElements.add(tag.name);
-		myStoryXMLElement.xmlAttributes.add("id", ""+myStories[i].id);
+		myStoryXMLElement.xmlAttributes.add("id", "" + myStories[i].id);
 		myStories[i].markup(myStoryXMLElement);
-}
-
-}
+	}
 
 }
 function main() {
@@ -146,13 +140,13 @@ function main() {
 			var myParaXMLElement = myStoryXMLElement.xmlElements.add(myParaTag);
 			myParaXMLElement.xmlAttributes.add("id", ""+myParaXMLElement.id);
 			myParaXMLElement.xmlAttributes.add("bounds", x1 + "," + y1 + "," + x2 + "," + y2);
+			//这里的id估计是动态的，后续需要把这个id的属性换成uid，然后用label属性传入。
 			myParaXMLElement.xmlAttributes.add("page", ""+page.id);
 
 
 			myStories[i].paragraphs[m].markup(myParaXMLElement);
-			var myColor=getColor(myDocument, "red", [0, 100, 100, 0]);
-			// alert("传入的"+[x1,y1,x2,y2])
-            drawOrigin(page,myColor,[x1,y1,x2,y2]);
+			// var myColor=getColor(myDocument, "red", [0, 100, 100, 0]);
+   //          drawOrigin(page,myColor,[x1,y1,x2,y2]);
 
 
 		}
