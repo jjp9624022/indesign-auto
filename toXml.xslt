@@ -4,6 +4,11 @@
 
 <xsl:template match="/">
   <xsl:for-each select="XMLElement[@MarkupTag='XMLTag/story']">
+    <story Self="{@Self}" >
+
+
+    </story>
+  </xsl:for-each>
   <xsl:for-each select="catalog/cd">
     <
     </xsl:for-each>

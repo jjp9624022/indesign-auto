@@ -107,10 +107,16 @@ function main() {
 		var myStoryXMLElement = myXML.xmlElements.add(myStoryTag);
 		myStoryXMLElement.xmlAttributes.add("id", ""+myStories[i].id);
 		myStories[i].markup(myStoryXMLElement);
+		var presentPage;
 		for (var m = 0; m < myStories[i].paragraphs.length; m++) {
 			//获取段落级别上的位置。
 
 			var myResult = myStories[i].paragraphs[m].insertionPoints;
+			var page = myResult[0].parentTextFrames[0].parentPage;
+
+			if(prensent!=page){
+				
+			}
 			x1 = myResult[0].horizontalOffset;
 			y1 = myResult[0].baseline-myResult[0].pointSize ;
 			
@@ -134,7 +140,7 @@ function main() {
 			// var page = myStories[i].notes[m].storyOffset.parentTextFrames[0].parentPage;
 			// var userName = myStories[i].notes[m].userName;
 			// var myText = contentsOfText(myStories[i].notes[m].texts);
-			var page = myResult[0].parentTextFrames[0].parentPage;
+			
 
 			//重要的来了，标记xml，这也是不得已的事情，只有xml支持完整的标记方式，其余的貌似都不太好用。后续支持也方便
 			var myParaXMLElement = myStoryXMLElement.xmlElements.add(myParaTag);
