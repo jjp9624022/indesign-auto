@@ -17,7 +17,7 @@ class ParaSerializer(Serializer):
     change = fields.Nested(ChangeSerializer)
 
     class Meta:
-        fields=("fields","bounds","contents","change")
+        fields=("id","bounds","contents","change")
 
 class NoteSerializer(Serializer):
     class Meta:
