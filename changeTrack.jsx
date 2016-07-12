@@ -172,9 +172,10 @@ function main() {
 
 
     //加入超链接
+    try{
     var mylinkSource = myDocument.hyperlinkTextSources.add(myLinkText);
     var myLinkDestination = myDocument.hyperlinkTextDestinations.add(myIndexText);
-    myDocument.hyperlinks.add(mylinkSource, myLinkDestination);
+    myDocument.hyperlinks.add(mylinkSource, myLinkDestination);}catch(error){}
 
 
     //在每一页加入书签
