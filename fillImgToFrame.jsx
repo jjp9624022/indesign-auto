@@ -50,7 +50,7 @@ function myFillImage(myFiles,  titlesInfo) {
       
      myObj[i].place(File(findFileByName(findTitle(myObj[i],titlesInfo),myFiles)));
       // myObj[i].place(File(myFiles[i]));
-      myObj[i].Fit(Options.FILL_PROPORTIONALLY);
+      myObj[i].fit(Options.FILL_PROPORTIONALLY);
       // myResurt[0].textFrames[0].contents=myCopyText;
 
     } catch (err) {

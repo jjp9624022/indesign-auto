@@ -227,7 +227,22 @@ function contentsOfText(inTexts) {
   var myContents = "";
   if (inTexts.length > 0) {
     for (var j = 0; j < inTexts.length; j++) {
-      myContents += inTexts[j].contents;
+
+    var x;
+      switch (inTexts[j].contents) {
+        case ' ':
+          x = "空格";
+          break;
+        case '\r':
+          x = "段落分隔符";
+          break;
+        case '\n':
+          x = "强制换行符";
+          break;
+        default:
+        x=inTexts[j].contents;
+      }
+      myContents += x;
 
     }
   } else {
@@ -327,7 +342,8 @@ function text_find_word(in_story) {
             myChangeTypes = "添加"
           }
 
-          var myText = contentsOfText(myStories[i].changes[m].texts);
+            var myText = contentsOfText(myStories[i].changes[m].texts);
+
 
 
 

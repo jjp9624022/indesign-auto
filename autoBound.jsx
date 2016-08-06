@@ -2,7 +2,6 @@
 
 function main() {
 
-  objectStyles
 
   var dlg = new Window('dialog', '调整框架宽度', [100, 100, 480, 490]);
   dlg.btnPnl = dlg.add('panel', [25, 15, 355, 90], '选择参考物件');
@@ -15,7 +14,7 @@ function main() {
 
   dlg.msgPnl = dlg.add('panel', [25, 110, 355, 210], '参数');
   dlg.msgPnl.titleEt = dlg.msgPnl.add('statictext', [10, 10, 60, 30],'自定宽度');
-  dlg.msgPnl.titleEt = dlg.msgPnl.add('edittext', [70, 10, 110, 30],'40');
+  dlg.msgPnl.vailueEt = dlg.msgPnl.add('edittext', [70, 10, 110, 30],'40');
   dlg.msgPnl.titleEt.enabled=false;
   // dlg.asFrameBounds.value = true;
 
@@ -44,24 +43,30 @@ function doChange(dlg) {
     // alert (myObj[i].parentPage.textFrames[0].geometricBounds);
     // myObj[i].geometricBounds[1]=myObj[i].parentPage.textFrames[0].geometricBounds[1];
     // myObj[i].geometricBounds[3]=myObj[i].parentPage.textFrames[0].geometricBounds[3];
-    if (dlg.btnPnl.asFrameBounds.value) {
+    if (dlg.btnPnl.asFrameBounds.value&&myObj[i].geometricBounds) {
 
       myObj[i].geometricBounds = [myObj[i].geometricBounds[0],
         myObj[i].parentPage.textFrames[0].geometricBounds[1],
         myObj[i].geometricBounds[2],
         myObj[i].parentPage.textFrames[0].geometricBounds[3]
       ];
-    } else if (dlg.btnPnl.asColumnsBounds.value) {
-     // alert(dlg.msgPnl.titleEt.text);
-     var sale=Number(dlg.msgPnl.titleEt.text)/(myObj[i].geometricBounds[3]-myObj[i].geometricBounds[1])*(myObj[i].geometricBounds[2]-myObj[i].geometricBounds[0])
+    } else if (dlg.btnPnl.asColumnsBounds.value&&myObj[i].geometricBounds) {
+     // alert(dlg.msgPnl.vailueEt.text);
+     var sale=Number(dlg.msgPnl.vailueEt.text)/(myObj[i].geometricBounds[3]-myObj[i].geometricBounds[1])*(myObj[i].geometricBounds[2]-myObj[i].geometricBounds[0])
 
       myObj[i].geometricBounds = [
       myObj[i].geometricBounds[0],
       myObj[i].geometricBounds[1],
       myObj[i].geometricBounds[0]+sale,
-      myObj[i].geometricBounds[1]+Number(dlg.msgPnl.titleEt.text),
+      myObj[i].geometricBounds[1]+Number(dlg.msgPnl.vailueEt.text),
       ];
-      myObj[i].fit(FitOptions.frameToContent);
+      try{
+
+      myObj[i].fit(FitOptions.FILL_PROPORTIONALLY);
+        
+      }catch(erro){
+        alert(erro);
+      }
     }
 
 
