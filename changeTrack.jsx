@@ -12,7 +12,7 @@ function main() {
   //颜色
   try {
     myColorA = myDocument.colors.item("Green");
-    //If the color does not exist, trying to get its name will generate an error.
+    // If the color does not exist, trying to get its name will generate an error.
     myColorA.name;
   } catch (myError) {
     //The color style did not exist, so create it.
@@ -88,9 +88,9 @@ function main() {
   for (var i = 0; i < mychanges.length; i++) {
     mychanges[i].id=i+1;
     if (presentPage != mychanges[i].page) {
-    //判断更改是否在当前页，如果在，在已有文本框里添加内容，如果不在，则重新建立文本框。  
+    //判断更改是否在当前页，如果在，在已有文本框里添加内容，如果不在，则重新建立文本框。
 
-      
+
 
       presentPage = mychanges[i].page;
       presentTextFrame = presentPage.textFrames.add();
