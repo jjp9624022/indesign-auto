@@ -1,0 +1,21 @@
+linkTextTextFrames();
+function linkTextTextFrames(){
+    var myDoc=app.activeDocument;
+    var myTextFrames=myDoc.textFrames;
+    for (var x=0;x<myTextFrames.length-1;x++){
+
+        //  alert(myTextFrames[x].contents.length);
+        try{
+          myTextFrames[x].nextTextFrame=myTextFrames[x+1]
+            }catch(err)
+  {
+  //在这里处理错误
+  alert(err);
+  }
+        
+
+
+    
+    }
+    
+    }
